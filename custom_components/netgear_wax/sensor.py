@@ -5,6 +5,7 @@ from typing import List
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.core import HomeAssistant
 from custom_components.netgear_wax import NetgearDataUpdateCoordinator
+from custom_components.netgear_wax.utils import human_bytes
 
 from .const import (
     DOMAIN, SAFETY_DEVICE_CLASS, DEVICES_ICON, UPDATE_ICON, CHART_DONUT_ICON, ROUTER_NETWORK_ICON, LAN_ICON,
@@ -126,18 +127,21 @@ class NetgearInterfaceTrafficSensor(NetgearSensor):
         NetgearSensor.__init__(self, coordinator, config_entry, sensor_type)
         self._coordinator = coordinator
         self._lan = lan
-        self._attr_unit_of_measurement = "B"
 
     @property
     def state(self):
         stats = self._coordinator.get_stats()
         if self._lan in stats:
-            return self._coordinator.get_stats().get(self._lan).bytes_transferred
+            return human_bytes(self._coordinator.get_stats().get(self._lan).bytes_transferred)
         return 0
 
     @property
     def icon(self) -> str:
         return ROUTER_NETWORK_ICON
+
+    @property
+    def unit_of_measurement(self):
+        return "B"
 
 
 class NetgearAddressSensor(NetgearSensor):
