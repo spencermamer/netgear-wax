@@ -23,6 +23,10 @@ async def async_setup_entry(hass: HomeAssistant, entry, async_add_devices):
         NetgearTotalDevicesSensor(coordinator, entry, "Connected Clients"),
         NetgearAddressSensor(coordinator, entry, "IP"),
         NetgearMacSensor(coordinator, entry, "MAC"),
+        NetgearFirmwareVersionSensor(coordinator, entry, "Firmware Version"),
+        NetgearDeviceNameSensor(coordinator, entry, "Device Name"),
+        NetgearModelSensor(coordinator, entry, "Model"),
+        NetgearSsidsSensor(coordinator, entry, "SSIDs"),
     ]
 
     stats = coordinator.get_stats()
@@ -172,3 +176,63 @@ class NetgearMacSensor(NetgearSensor):
     @property
     def icon(self) -> str:
         return LAN_ICON
+
+
+class NetgearFirmwareVersionSensor(NetgearSensor):
+    """ Sensor to show the firmware version of the device """
+
+    def __init__(self, coordinator: NetgearDataUpdateCoordinator, config_entry, sensor_type: str):
+        NetgearSensor.__init__(self, coordinator, config_entry, sensor_type)
+
+    @property
+    def state(self):
+        return self._coordinator.get_firmware_version()
+
+    @property
+    def icon(self) -> str:
+        return UPDATE_ICON
+
+
+class NetgearDeviceNameSensor(NetgearSensor):
+    """ Sensor to show the device name """
+
+    def __init__(self, coordinator: NetgearDataUpdateCoordinator, config_entry, sensor_type: str):
+        NetgearSensor.__init__(self, coordinator, config_entry, sensor_type)
+
+    @property
+    def state(self):
+        return self._coordinator.get_device_name()
+
+    @property
+    def icon(self) -> str:
+        return ROUTER_NETWORK_ICON
+
+
+class NetgearModelSensor(NetgearSensor):
+    """ Sensor to show the device model """
+
+    def __init__(self, coordinator: NetgearDataUpdateCoordinator, config_entry, sensor_type: str):
+        NetgearSensor.__init__(self, coordinator, config_entry, sensor_type)
+
+    @property
+    def state(self):
+        return self._coordinator.get_model()
+
+    @property
+    def icon(self) -> str:
+        return ROUTER_NETWORK_ICON
+
+
+class NetgearSsidsSensor(NetgearSensor):
+    """ Sensor to show the SSIDs """
+
+    def __init__(self, coordinator: NetgearDataUpdateCoordinator, config_entry, sensor_type: str):
+        NetgearSensor.__init__(self, coordinator, config_entry, sensor_type)
+
+    @property
+    def state(self):
+        return ", ".join([ssid.ssid for ssid in self._coordinator.get_ssids()])
+
+    @property
+    def icon(self) -> str:
+        return ROUTER_NETWORK_ICON
